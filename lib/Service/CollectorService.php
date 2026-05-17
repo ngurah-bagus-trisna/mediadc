@@ -29,8 +29,8 @@ declare(strict_types=1);
 namespace OCA\MediaDC\Service;
 
 use DOMDocument;
-use OCA\Cloud_Py_API\Service\PythonService;
-use OCA\Cloud_Py_API\Service\UtilsService as CPAUtilsService;
+use OCA\MediaDC\Service\CPAUtilsService;
+use OCA\MediaDC\Service\PythonService;
 use OCA\Files_Sharing\SharedStorage;
 use OCA\MediaDC\AppInfo\Application;
 use OCA\MediaDC\BackgroundJob\QueuedTaskJob;

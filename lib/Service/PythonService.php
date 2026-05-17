@@ -1,0 +1,90 @@
+<?php
+
+declare(strict_types=1);
+
+namespace OCA\MediaDC\Service;
+
+use Psr\Log\LoggerInterface;
+
+class PythonService {
+	public function __construct(
+		private readonly LoggerInterface $logger,
+		private readonly CPAUtilsService $cpaUtils,
+	) {
+	}
+
+	/**
+	 * Run a Python script in the app directory.
+	 *
+	 * @param string $appId app id (e.g. 'mediadc')
+	 * @param string $scriptName script path relative to the app directory (e.g. 'main.py')
+	 * @param array $scriptParams CLI arguments as key=>value pairs
+	 * @param bool $nonBlocking run asynchronously with nohup
+	 * @param array $env environment variables as key=>value pairs
+	 * @param bool $binary unused — kept for API compatibility (always source mode)
+	 */
+	/**
+	 * @return array|void
+	 */
+	public function run(
+		string $appId,
+		string $scriptName,
+		array $scriptParams = [],
+		bool $nonBlocking = false,
+		array $env = [],
+		bool $binary = false,
+	) {
+		if (!$this->cpaUtils->isFunctionEnabled('exec')) {
+			$this->logger->error('PHP exec() is not available');
+			return;
+		}
+
+		$appPath = \OC::$SERVERROOT . '/apps/' . $appId;
+		$pythonBin = $appPath . '/.venv/bin/python3';
+		$cmd = escapeshellarg($pythonBin) . ' ' . escapeshellarg($appPath . '/' . $scriptName);
+
+		foreach ($scriptParams as $key => $value) {
+			if ($value === '') {
+				$cmd .= ' ' . escapeshellarg($key);
+			} else {
+				$cmd .= ' ' . escapeshellarg($key) . ' ' . escapeshellarg((string)$value);
+			}
+		}
+
+		$envStr = '';
+		foreach ($env as $key => $value) {
+			$envStr .= $key . '=' . escapeshellarg((string)$value) . ' ';
+		}
+
+		$fullCmd = $envStr . $cmd;
+
+		if ($nonBlocking) {
+			$logDir = \OC::$SERVERROOT . '/data/appdata_' . \OC::$server->getConfig()->getSystemValue('instanceid')
+				. '/' . $appId . '/logs';
+			@mkdir($logDir, 0755, true);
+			$logFile = $logDir . '/task_' . date('Y-m-d_H-i-s') . '.log';
+			exec('nohup ' . $fullCmd . ' > ' . escapeshellarg($logFile) . ' 2>&1 &');
+			return;
+		}
+
+		exec($fullCmd, $output, $resultCode);
+		$errors = '';
+
+		if ($resultCode !== 0) {
+			$firstLine = $output[0] ?? '';
+			$decoded = json_decode($firstLine, true);
+			if ($decoded !== null) {
+				$errors = $firstLine;
+			} else {
+				exec($fullCmd . ' 2>&1', $stderrOutput);
+				$errors = implode("\n", $stderrOutput);
+			}
+		}
+
+		return [
+			'output' => $output,
+			'result_code' => $resultCode,
+			'errors' => $errors,
+		];
+	}
+}
