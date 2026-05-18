@@ -63,21 +63,37 @@ class PythonService {
 
 		$envStr = '';
 		foreach ($env as $key => $value) {
-			$envStr .= $key . '=' . escapeshellarg((string)$value) . ' ';
+			$strValue = (string)$value;
+			// Skip empty env vars — they break shell parsing:
+			// "VAR= OTHER=val cmd" makes bash run "OTHER=val" as the command
+			if ($strValue === '') {
+				continue;
+			}
+			$envStr .= $key . '=' . escapeshellarg($strValue) . ' ';
 		}
 
-		$fullCmd = $envStr . $cmd;
+		// Use 'env' to set env vars — avoids shell word-splitting issues
+		$prefixedCmd = 'env ' . $envStr . $cmd;
+		$prefixedNohupCmd = 'env ' . $envStr . 'nohup ' . $cmd;
 
 		if ($nonBlocking) {
 			$logDir = \OC::$SERVERROOT . '/data/appdata_' . \OC::$server->getConfig()->getSystemValue('instanceid')
 				. '/' . $appId . '/logs';
 			@mkdir($logDir, 0755, true);
 			$logFile = $logDir . '/task_' . date('Y-m-d_H-i-s') . '.log';
-			exec('nohup ' . $fullCmd . ' > ' . escapeshellarg($logFile) . ' 2>&1 &');
+			exec($prefixedNohupCmd . ' > ' . escapeshellarg($logFile) . ' 2>&1 &');
+			// Brief wait then check if nohup actually launched successfully
+			usleep(500000); // 0.5s
+			if (file_exists($logFile)) {
+				$earlyOutput = @file_get_contents($logFile);
+				if ($earlyOutput !== false && str_starts_with($earlyOutput, 'nohup: failed to run command')) {
+					$this->logger->error('Python worker failed to start: {error}', ['error' => $earlyOutput]);
+				}
+			}
 			return;
 		}
 
-		exec($fullCmd, $output, $resultCode);
+		exec($prefixedCmd, $output, $resultCode);
 		$errors = '';
 
 		if ($resultCode !== 0) {
@@ -86,7 +102,7 @@ class PythonService {
 			if ($decoded !== null) {
 				$errors = $firstLine;
 			} else {
-				exec($fullCmd . ' 2>&1', $stderrOutput);
+				exec($prefixedCmd . ' 2>&1', $stderrOutput);
 				$errors = implode("\n", $stderrOutput);
 			}
 		}

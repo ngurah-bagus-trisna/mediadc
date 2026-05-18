@@ -107,6 +107,8 @@ class CollectorService {
 		if ($processesRunning < (int)$pyLimitSetting->getValue()) {
 			$createdTask = $this->createCollectorTask($params);
 			if ($createdTask !== null) {
+					// Brief delay ensures DB write is visible to Python worker
+					usleep(1500000);
 				if (json_decode($pythonBinary->getValue())) {
 					$scriptName = 'binaries/' . Application::APP_ID
 						. '_' . $this->cpaUtils->getBinaryName() . '/main';
@@ -241,6 +243,8 @@ class CollectorService {
 						// Prepend the cwd that is temp folder
 						$scriptName = $result['path'] . $scriptName;
 					}
+					// Brief delay ensures DB write is visible to Python worker
+					usleep(1500000);
 					$this->pythonService->run(Application::APP_ID,
 						$scriptName, ['-t' => $taskId], true, [
 							'PHP_PATH' => $this->cpaUtils->getPhpInterpreter(),

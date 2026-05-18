@@ -33,6 +33,18 @@ class CPAUtilsService {
 		if ($basename === 'php' || preg_match('/^php\d+(?:\.\d+)*$/', $basename)) {
 			return PHP_BINARY;
 		}
+		// In FPM/CGI context, PHP_BINARY is php-fpm8.3 — find the real CLI
+		$candidates = [
+			'php' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION,
+			'php' . PHP_MAJOR_VERSION,
+			'php',
+		];
+		foreach ($candidates as $candidate) {
+			$which = trim(shell_exec('which ' . escapeshellarg($candidate) . ' 2>/dev/null') ?: '');
+			if ($which !== '' && is_executable($which)) {
+				return $which;
+			}
+		}
 		return 'php';
 	}
 
