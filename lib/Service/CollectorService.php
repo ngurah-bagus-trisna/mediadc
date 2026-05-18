@@ -110,8 +110,15 @@ class CollectorService {
 					// Brief delay ensures DB write is visible to Python worker
 					usleep(1500000);
 				if (json_decode($pythonBinary->getValue())) {
-					$scriptName = 'binaries/' . Application::APP_ID
+					$binaryPath = 'binaries/' . Application::APP_ID
 						. '_' . $this->cpaUtils->getBinaryName() . '/main';
+					$appPath = \OC::$SERVERROOT . '/apps/' . Application::APP_ID;
+					if (!file_exists($appPath . '/' . $binaryPath)) {
+						$this->logger->info('Binary not found, falling back to source Python mode');
+						$scriptName = 'main.py';
+					} else {
+						$scriptName = $binaryPath;
+					}
 				} else {
 					$scriptName = 'main.py';
 				}
@@ -183,8 +190,15 @@ class CollectorService {
 		$processesRunning = $this->tasksMapper->findAllRunning();
 		$pythonBinary = $this->settingsMapper->findByName('python_binary');
 		if (json_decode($pythonBinary->getValue())) {
-			$scriptName = 'binaries/' . Application::APP_ID
+			$binaryPath = 'binaries/' . Application::APP_ID
 				. '_' . $this->cpaUtils->getBinaryName() . '/main';
+					$appPath = \OC::$SERVERROOT . '/apps/' . Application::APP_ID;
+					if (!file_exists($appPath . '/' . $binaryPath)) {
+						$this->logger->info('Binary not found, falling back to source Python mode');
+						$scriptName = 'main.py';
+					} else {
+						$scriptName = $binaryPath;
+					}
 		} else {
 			$scriptName = 'main.py';
 		}
