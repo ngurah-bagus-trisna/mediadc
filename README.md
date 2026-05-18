@@ -31,6 +31,15 @@ The [original MediaDC](https://github.com/cloud-py-api/mediadc) by Andrey Boryse
    ```
 4. **Done!** The Python environment (venv + packages) will be automatically set up during first enable. This may take 1–3 minutes.
 
+### Verify installation
+
+Run the built-in health check script:
+```bash
+sudo -u www-data bash /path/to/nextcloud/apps/mediadc/scripts/setup-check.sh /path/to/nextcloud
+```
+
+This checks: system deps, PHP, Nextcloud status, Python venv, all packages, DB connectivity, and runs an end-to-end smoke test.
+
 **Requirements:**
 - Nextcloud 30, 31, 32, 33, or 34
 - PHP 8.1 or later
