@@ -3,5 +3,6 @@ scipy
 pywavelets
 pillow==10.3.0
 hexhamming
-nc-py-api==0.0.11
+pymysql
+pg8000
 pi-heif>=0.9.0

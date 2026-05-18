@@ -28,14 +28,13 @@ declare(strict_types=1);
 
 namespace OCA\MediaDC\Migration;
 
-use OCA\MediaDC\AppInfo\Application;
 use OCA\MediaDC\Db\Setting;
 
 use OCA\MediaDC\Db\SettingMapper;
 
 use OCA\MediaDC\Migration\data\AppInitialData;
 use OCA\MediaDC\Service\AppDataService;
-use OCA\MediaDC\Service\CPAUtilsService;
+use OCA\MediaDC\Service\PythonSetupService;
 use OCA\MediaDC\Service\UtilsService;
 use OCP\App\IAppManager;
 use OCP\Migration\IOutput;
@@ -45,8 +44,8 @@ class AppDataInitializationStep implements IRepairStep {
 	public function __construct(
 		private readonly SettingMapper $settingMapper,
 		private readonly UtilsService $utils,
-		private readonly CPAUtilsService $cpaUtils,
 		private readonly AppDataService $appDataService,
+		private readonly PythonSetupService $pythonSetupService,
 		private readonly IAppManager $appManager,
 	) {
 	}
@@ -56,7 +55,7 @@ class AppDataInitializationStep implements IRepairStep {
 	}
 
 	public function run(IOutput $output) {
-		$output->startProgress(3);
+		$output->startProgress(4);
 		$output->advance(1, 'Filling database with initial data');
 		$app_data = AppInitialData::$APP_INITIAL_DATA;
 
@@ -75,6 +74,12 @@ class AppDataInitializationStep implements IRepairStep {
 
 		$output->advance(1, 'Checking for initial data changes and syncing with database');
 		$this->utils->checkForSettingsUpdates($app_data);
+
+		$output->advance(1, 'Setting up Python environment (this may take a few minutes)...');
+		$pythonSetup = $this->pythonSetupService->setup();
+		if (!$pythonSetup['success']) {
+			$output->warning($pythonSetup['message']);
+		}
 
 		$output->advance(1, 'Creating app data folders');
 		$this->appDataService->createAppDataFolder('binaries');

@@ -10,6 +10,7 @@ class PythonService {
 	public function __construct(
 		private readonly LoggerInterface $logger,
 		private readonly CPAUtilsService $cpaUtils,
+		private readonly PythonSetupService $pythonSetup,
 	) {
 	}
 
@@ -22,8 +23,7 @@ class PythonService {
 	 * @param bool $nonBlocking run asynchronously with nohup
 	 * @param array $env environment variables as key=>value pairs
 	 * @param bool $binary unused — kept for API compatibility (always source mode)
-	 */
-	/**
+	 *
 	 * @return array|void
 	 */
 	public function run(
@@ -37,6 +37,16 @@ class PythonService {
 		if (!$this->cpaUtils->isFunctionEnabled('exec')) {
 			$this->logger->error('PHP exec() is not available');
 			return;
+		}
+
+		// Auto-setup Python environment if not ready
+		if (!$this->pythonSetup->isReady()) {
+			$setupResult = $this->pythonSetup->setup();
+			if (!$setupResult['ready']) {
+				$msg = 'Python environment not ready: ' . $setupResult['message'];
+				$this->logger->error($msg);
+				return ['output' => [], 'result_code' => -1, 'errors' => $msg];
+			}
 		}
 
 		$appPath = \OC::$SERVERROOT . '/apps/' . $appId;
