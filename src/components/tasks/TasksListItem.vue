@@ -44,7 +44,7 @@
 			<NcActionButton icon="icon-pause" :close-after-click="true" @click="terminateTask(task.id)">
 				{{ t('mediadc', 'Stop') }}
 			</NcActionButton>
-			<NcActionButton v-tooltip="{content: t('mediadc', 'Create copy of the task'), placement: 'left'}"
+			<NcActionButton :title="t('mediadc', 'Create copy of the task')"
 				:close-after-click="true"
 				@click="duplicateTask(task)">
 				{{ t('mediadc', 'Duplicate') }}
@@ -62,11 +62,9 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 
-import {
-	NcActionButton,
-	NcProgressBar,
-	NcListItem,
-} from '@nextcloud/vue'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcProgressBar from '@nextcloud/vue/components/NcProgressBar'
+import NcListItem from '@nextcloud/vue/components/NcListItem'
 import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 
 import Formats from '../../mixins/Formats.js'

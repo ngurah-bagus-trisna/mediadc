@@ -24,17 +24,15 @@
 
 <template>
 	<div v-if="!loading" class="container">
-		<TasksEdit v-if="editingTask" :opened.sync="editingTask" />
-		<DetailsExport v-if="exporting" :opened.sync="exporting" :task="task" />
+		<TasksEdit v-if="editingTask" v-model:opened="editingTask" />
+		<DetailsExport v-if="exporting" v-model:opened="exporting" :task="task" />
 		<div class="task-details">
 			<div class="task-details-heading">
 				<h2>
 					{{ rootTitle }}
 					<NcButton v-if="isValidUser"
-						v-tooltip="{content: !collapsedStatus
-							? t('mediadc', 'Collapse task status')
-							: t('mediadc', 'Show task status'), placement: 'bottom-end'}"
-						type="tertiary"
+						:title="!collapsedStatus ? t('mediadc', 'Collapse task status') : t('mediadc', 'Show task status')"
+						variant="tertiary"
 						:aria-label="t('mediadc', 'Collapse task status')"
 						style="margin: 0 10px;"
 						@click="collapseTaskStatus">
@@ -76,26 +74,26 @@
 								</span>
 							</div>
 							<NcActions style="margin: 0 0 0 10px;">
-								<NcActionButton v-tooltip="{content: t('mediadc', 'Restart task with current params'), placement: 'left'}"
+								<NcActionButton :title="t('mediadc', 'Restart task with current params')"
 									icon="icon-history"
 									:close-after-click="true"
 									@click="restartTask(task)">
 									{{ getStatusBadge(task) === 'duplicated' ? t('mediadc', 'Start') : t('mediadc', 'Restart') }}
 								</NcActionButton>
-								<NcActionButton v-tooltip="{content: t('mediadc', 'Edit task params'), placement: 'left'}"
+								<NcActionButton :title="t('mediadc', 'Edit task params')"
 									icon="icon-rename"
 									:close-after-click="true"
 									@click="openEditTaskDialog(task)">
 									{{ t('mediadc', 'Edit') }}
 								</NcActionButton>
-								<NcActionButton v-tooltip="{content: t('mediadc', 'Terminate task execution'), placement: 'left'}"
+								<NcActionButton :title="t('mediadc', 'Terminate task execution')"
 									icon="icon-pause"
 									:close-after-click="true"
 									@click="_terminateTask(task)">
 									{{ t('mediadc', 'Stop') }}
 								</NcActionButton>
 								<NcActionButton v-if="getStatusBadge(task) === 'finished'"
-									v-tooltip="{ content: t('mediadc', 'Export task results'), placement: 'left' }"
+									:title="t('mediadc', 'Export task results')"
 									:close-after-click="true"
 									@click="openExportResultsDialog(task)">
 									<template #default>
@@ -105,7 +103,7 @@
 										<FileExportOutline :size="18" />
 									</template>
 								</NcActionButton>
-								<NcActionButton v-tooltip="{content: t('mediadc', 'Delete task'), placement: 'left'}"
+								<NcActionButton :title="t('mediadc', 'Delete task')"
 									icon="icon-delete"
 									:close-after-click="true"
 									@click="deleteTask(task)">
@@ -122,7 +120,7 @@
 						<div class="target-directories-list">
 							<div v-for="dir in taskInfo.target_directories"
 								:key="dir.fileid"
-								v-tooltip="{content: getDirOwnerToolip(dir), placement: 'bottom'}"
+								:title="getDirOwnerToolip(dir)"
 								class="target-directory-row">
 								<a :href="filesDirLink(dir)" target="_blank">
 									<b>
@@ -152,8 +150,8 @@
 			<div v-if="hasErrors" class="errors">
 				<div class="errors-heading" style="display: flex; align-items: center;">
 					<h3>{{ t('mediadc', 'Task errors' ) }}</h3>
-					<NcButton v-tooltip="t('mediadc', 'Copy to clipboard')"
-						type="tertiary-no-background"
+					<NcButton :title="t('mediadc', 'Copy to clipboard')"
+						variant="tertiary-no-background"
 						:aria-label="t('mediadc', 'Copy to clipboard')"
 						style="margin: 0 10px;"
 						@click="copyErrorsToClipboard">
@@ -180,18 +178,20 @@ import { mapActions, mapGetters } from 'vuex'
 
 import DetailsList from '../components/details/DetailsList.vue'
 import Formats from '../mixins/Formats.js'
+import { confirmDialog } from '../utils/confirm.js'
 import TasksEdit from '../components/tasks/TasksEdit.vue'
 import DetailsExport from '../components/details/DetailsExport.vue'
 
-import NcActions from '@nextcloud/vue/dist/Components/NcActions.js'
-import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
-import NcProgressBar from '@nextcloud/vue/dist/Components/NcProgressBar.js'
-import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
+import NcActions from '@nextcloud/vue/components/NcActions'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcProgressBar from '@nextcloud/vue/components/NcProgressBar'
+import NcButton from '@nextcloud/vue/components/NcButton'
 import ContentCopy from 'vue-material-design-icons/ContentCopy.vue'
 import FileExportOutline from 'vue-material-design-icons/FileExportOutline.vue'
 
 export default {
 	name: 'CollectorDetails',
+	emits: ['update:loading'],
 	components: {
 		DetailsList,
 		TasksEdit,
@@ -252,7 +252,7 @@ export default {
 		subscribe('restartTask', this.onRestartTaskEvent)
 		subscribe('updateTaskInfo', this.getDetailFilesTotalSize)
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		clearInterval(this.tasksUpdater)
 		unsubscribe('updateTaskInfo', this.getDetailFilesTotalSize)
 		unsubscribe('restartTask', this.onRestartTaskEvent)
@@ -330,18 +330,17 @@ export default {
 		},
 		deleteTask(task) {
 			if (this.isValidUser) {
-				const self = this
-				OC.dialogs.confirm(this.t('mediadc', 'Are sure you want to delete this task?'),
+				confirmDialog(
 					this.t('mediadc', 'Confirm task deletion'),
-					function(success) {
-						if (success) {
-							self.$store.dispatch('deleteTask', task).then(() => {
-								self.$router.push({ name: 'collector' })
-								showSuccess(self.t('mediadc', 'Task successfully deleted'))
-							})
-						}
-					},
-				)
+					this.t('mediadc', 'Are sure you want to delete this task?'),
+				).then((success) => {
+					if (success) {
+						this.$store.dispatch('deleteTask', task).then(() => {
+							this.$router.push({ name: 'collector' })
+							showSuccess(this.t('mediadc', 'Task successfully deleted'))
+						})
+					}
+				})
 			} else {
 				showWarning(this.t('mediadc', 'You are not allowed to delete this task'))
 			}

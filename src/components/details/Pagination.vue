@@ -25,7 +25,7 @@
 <template>
 	<div class="pagination">
 		<NcButton v-if="details.length > itemsPerPage"
-			type="tertiary"
+			variant="tertiary"
 			:aria-label="t('mediadc', 'Previous duplicate list page')"
 			@click="prevGroupsPage">
 			<template #icon>
@@ -35,7 +35,7 @@
 		<span v-if="details.length > itemsPerPage" style="margin-left: 5px;">{{ t('mediadc', 'Page:') }}&nbsp;</span>
 		<span v-if="details.length > itemsPerPage" style="margin-right: 5px;">{{ page + 1 }}/{{ Math.ceil(details.length / itemsPerPage) }}</span>
 		<NcButton v-if="details.length > itemsPerPage"
-			type="tertiary"
+			variant="tertiary"
 			:aria-label="t('mediadc', 'Next duplicate list page')"
 			@click="nextGroupsPage">
 			<template #icon>
@@ -51,8 +51,8 @@
 				name="go_to_page"
 				:aria-label="t('mediadc', 'Page to navigate to')"
 				@keyup.enter="navigateToPage">
-			<NcButton v-tooltip="t('mediadc', 'Go to page')"
-				type="tertiary"
+			<NcButton :title="t('mediadc', 'Go to page')"
+				variant="tertiary"
 				:aria-label="t('mediadc', 'Navigate to duplicate list page')"
 				@click="navigateToPage">
 				<template #icon>
@@ -64,11 +64,12 @@
 </template>
 
 <script>
-import { NcButton } from '@nextcloud/vue'
+import NcButton from '@nextcloud/vue/components/NcButton'
 import { mapGetters } from 'vuex'
 
 export default {
 	name: 'Pagination',
+	emits: ['update:page'],
 	components: {
 		NcButton,
 	},

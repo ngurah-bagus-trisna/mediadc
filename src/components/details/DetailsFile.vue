@@ -70,19 +70,19 @@
 			<span class="owner">{{ file.fileowner }}</span>
 			<span class="size" :title="file.filesize + ' B'">{{ formatBytes(Number(file.filesize)) }}</span>
 			<div class="actions" style="display: flex;">
-				<NcCheckboxRadioSwitch v-tooltip="{ content: t('mediadc', 'Select file'), placement: 'top' }"
+				<NcCheckboxRadioSwitch :title="t('mediadc', 'Select file')"
 					class="mediadc-checkbox-only"
-					:checked.sync="checked" />
-				<NcButton v-tooltip="{ content: t('mediadc', 'Delete file'), placement: 'top' }"
-					type="tertiary"
+					v-model="checked" />
+				<NcButton :title="t('mediadc', 'Delete file')"
+					variant="tertiary"
 					:aria-label="t('mediadc', 'Delete file')"
 					@click="deleteGroupFile(file)">
 					<template #icon>
 						<span class="icon-delete" />
 					</template>
 				</NcButton>
-				<NcButton v-tooltip="{ content: t('mediadc', 'Remove file (mark resolved)'), placement: 'top' }"
-					type="tertiary"
+				<NcButton :title="t('mediadc', 'Remove file (mark resolved)')"
+					variant="tertiary"
 					:aria-label="t('mediadc', 'Remove file (mark resolved)')"
 					@click="removeGroupFile(file)">
 					<template #icon>
@@ -101,7 +101,9 @@ import { emit, subscribe, unsubscribe } from '@nextcloud/event-bus'
 import { showError, showMessage, showWarning } from '@nextcloud/dialogs'
 import { generateRemoteUrl, generateUrl } from '@nextcloud/router'
 
-import { NcButton, NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import NcButton from '@nextcloud/vue/components/NcButton'
+import { confirmDialog } from '../../utils/confirm.js'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 
 import { mapGetters } from 'vuex'
 
@@ -109,6 +111,7 @@ import Formats from '../../mixins/Formats.js'
 
 export default {
 	name: 'DetailsFile',
+	emits: ['update:checkedFiles', 'update:files'],
 	components: {
 		NcButton,
 		NcCheckboxRadioSwitch,
@@ -183,7 +186,7 @@ export default {
 		this.checked = fileIndexChecked !== -1
 		subscribe('deselectFiles', this.deselect)
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		unsubscribe('deselectFiles', this.deselect)
 	},
 	methods: {
@@ -210,13 +213,14 @@ export default {
 		},
 		deleteGroupFile(file) {
 			if (this.deleteFileConfirmation) {
-				const self = this
-				OC.dialogs.confirm(this.t('mediadc', 'Are you sure you want to delete this file?'),
-					this.t('mediadc', 'Confirm file deletion'), function(success) {
-						if (success) {
-							self._deleteGroupFile(file)
-						}
-					})
+				confirmDialog(
+					this.t('mediadc', 'Confirm file deletion'),
+					this.t('mediadc', 'Are you sure you want to delete this file?'),
+				).then((success) => {
+					if (success) {
+						this._deleteGroupFile(file)
+					}
+				})
 			} else {
 				this._deleteGroupFile(file)
 			}

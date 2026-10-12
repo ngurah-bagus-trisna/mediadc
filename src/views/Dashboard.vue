@@ -40,7 +40,7 @@
 						<ClipboardListOutline />
 					</template>
 					<template #action>
-						<NcButton :href="getAppUrl()" type="primary">
+						<NcButton :href="getAppUrl()" variant="primary">
 							{{ t('mediadc', 'Create a new one!') }}
 						</NcButton>
 					</template>
@@ -54,13 +54,11 @@
 import { getCurrentUser } from '@nextcloud/auth'
 import { generateUrl } from '@nextcloud/router'
 import { loadState } from '@nextcloud/initial-state'
-import {
-	NcDashboardWidget,
-	NcDashboardWidgetItem,
-	NcButton,
-	NcEmptyContent,
-	ClipboardListOutline,
-} from '@nextcloud/vue'
+import NcDashboardWidget from '@nextcloud/vue/components/NcDashboardWidget'
+import NcDashboardWidgetItem from '@nextcloud/vue/components/NcDashboardWidgetItem'
+import NcButton from '@nextcloud/vue/components/NcButton'
+import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
+import ClipboardListOutline from 'vue-material-design-icons/ClipboardListOutline.vue'
 
 import Formats from '../mixins/Formats.js'
 

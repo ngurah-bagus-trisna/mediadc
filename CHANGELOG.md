@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.4 - 2026-10-12]
+
+### Changed
+
+- Frontend migrated from Vue 2 to Vue 3: `vue` 3, `vue-router` 4, `vuex` 4, `@nextcloud/vue` 9, `@nextcloud/dialogs` 7, `@nextcloud/files` 4 (the declared `^3.9.0` did not match the v4 API the Files action already used)
+- Main page mounts on `#mediadc-app` instead of `#content` (Vue 3 mounts inside the target element instead of replacing it)
+- Tooltips are now native `title` attributes; the `v-tooltip` directive was removed from `@nextcloud/vue` 9
+- `OC.dialogs.confirm()` / `OC.dialogs.info()` replaced by `@nextcloud/dialogs`
+- ESLint moved to the flat config (`eslint.config.mjs`) and is no longer run as part of the webpack build
+
+### Removed
+
+- `vuex-router-sync` (no Vue 3 release); the details store reads the route from the router
+
+### Fixed
+
+- Dashboard widget: the empty-state icon was imported from `@nextcloud/vue`, which does not export it
+
+## [0.5.3 - 2026-10-11]
+
+Nextcloud 35 compatibility. Minimum supported Nextcloud is now 33.
+
+### Fixed
+
+- Files app "Scan for duplicates" action: ported to the `@nextcloud/files` v4 API (plain action object, context-object callbacks). The v3 `FileAction` class is not picked up by the Files app on Nextcloud 33+
+- Python environment: `pillow==10.3.0` cannot be installed on Python 3.13 (Debian 13); use Pillow 11+ there. Older Pythons keep the previous pin
+- Python environment: add `cryptography`, required by PyMySQL for `caching_sha2_password` (default on MySQL 8.4+ / 9.x)
+- Python environment: a failed `pip install` no longer leaves a venv behind that is mistaken for a working one
+- Main page no longer fatals if the Files `LoadSidebar` or Viewer `LoadViewer` event class is unavailable
+- The legacy `OC.Files.getClient()` call in the main entry point can no longer throw on Nextcloud versions that removed it
+
+### Changed
+
+- `info.xml`: Nextcloud 33–35, PHP min-version 8.1 (the code already required it)
+- Task name created from the Files action now uses the folder's full path
+
 ## [0.4.0 - 2024-10-21]
 
 Maintenance update. Update NC versions to support NC30+ only.

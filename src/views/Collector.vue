@@ -46,6 +46,7 @@ import { mapActions } from 'vuex'
 
 export default {
 	name: 'Collector',
+	emits: ['update:loading'],
 	components: {
 		TasksNew,
 		TasksList,

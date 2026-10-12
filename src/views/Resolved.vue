@@ -45,6 +45,7 @@ import ResolvedList from '../components/resolved/ResolvedList.vue'
 
 export default {
 	name: 'Resolved',
+	emits: ['update:loading'],
 	components: {
 		ResolvedList,
 	},

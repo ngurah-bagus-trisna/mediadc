@@ -89,6 +89,9 @@ class PythonSetupService {
 		if ($pipRc !== 0) {
 			$msg = 'Failed to install Python packages: ' . implode("\n", $pipOutput);
 			$this->logger->error($msg);
+			// isReady() only checks for the venv's python binary, so a venv left behind by a failed
+			// pip run would be treated as ready forever. Remove it so the next run retries the setup.
+			exec('rm -rf ' . escapeshellarg($appPath . '/.venv') . ' 2>&1');
 			return ['success' => false, 'message' => $msg, 'ready' => false];
 		}
 

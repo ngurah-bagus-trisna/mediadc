@@ -26,7 +26,7 @@
 	<div class="resolved-list">
 		<div class="resolved-list-heading">
 			<div v-if="resolved.total_pages > 1" class="pagination pagination-desktop">
-				<NcButton type="tertiary"
+				<NcButton variant="tertiary"
 					:aria-label="t('mediadc', 'Previous resolved list page')"
 					@click="prevResolvedPage">
 					<template #icon>
@@ -35,7 +35,7 @@
 				</NcButton>
 				<span style="margin-left: 5px;">{{ t('mediadc', 'Page:') }}&nbsp;</span>
 				<span style="margin-right: 5px;">{{ page + 1 }}/{{ resolved.total_pages }}</span>
-				<NcButton type="tertiary"
+				<NcButton variant="tertiary"
 					:aria-label="t('mediadc', 'Next resolved list page')"
 					@click="nextResolvedPage">
 					<template #icon>
@@ -52,8 +52,8 @@
 						name="go_to_page"
 						:aria-label="t('mediadc', 'Page to navigate to')"
 						@keyup.enter="navigateToPage">
-					<NcButton v-tooltip="t('mediadc', 'Go to page')"
-						type="tertiary"
+					<NcButton :title="t('mediadc', 'Go to page')"
+						variant="tertiary"
 						:aria-label="t('mediadc', 'Navigate to resolved list page')"
 						@click="navigateToPage">
 						<template #icon>
@@ -64,8 +64,8 @@
 			</div>
 			<h2>{{ t('mediadc', 'Resolved list') }} ({{ resolved.total_items }} {{ n('mediadc', 'file', 'files', resolved.total_items) }})</h2>
 			<div class="type-actions">
-				<NcButton v-tooltip="t('mediadc', 'Toggle media type')"
-					type="tertiary"
+				<NcButton :title="t('mediadc', 'Toggle media type')"
+					variant="tertiary"
 					:aria-label="t('mediadc', 'Toggle resolved list media type')"
 					@click="toggleMediaType">
 					<template #icon>
@@ -73,8 +73,8 @@
 					</template>
 				</NcButton>
 				<NcButton v-if="resolved.total_items > 0"
-					v-tooltip="cleanupText"
-					type="tertiary"
+					:title="cleanupText"
+					variant="tertiary"
 					:aria-label="cleanupText"
 					:disabled="cleanuploading"
 					@click="cleanup">
@@ -84,8 +84,8 @@
 					</template>
 				</NcButton>
 			</div>
-			<NcButton v-tooltip="viewTooltip"
-				type="tertiary"
+			<NcButton :title="viewTooltip"
+				variant="tertiary"
 				class="toggle-view-button"
 				:aria-label="t('mediadc', 'Toggle list view (list or grid)')"
 				@click="toggleListView">
@@ -95,7 +95,7 @@
 			</NcButton>
 		</div>
 		<div v-if="resolved.total_pages > 1" class="pagination pagination-mobile">
-			<NcButton type="tertiary"
+			<NcButton variant="tertiary"
 				:aria-label="t('mediadc', 'Previous resolved list page')"
 				@click="prevResolvedPage">
 				<template #icon>
@@ -104,7 +104,7 @@
 			</NcButton>
 			<span style="margin-left: 5px;">{{ t('mediadc', 'Page:') }}&nbsp;</span>
 			<span style="margin-right: 5px;">{{ page + 1 }}/{{ resolved.total_pages }}</span>
-			<NcButton type="tertiary"
+			<NcButton variant="tertiary"
 				:aria-label="t('mediadc', 'Next resolved list page')"
 				@click="nextResolvedPage">
 				<template #icon>
@@ -121,8 +121,8 @@
 					name="go_to_page"
 					:aria-label="t('mediadc', 'Page to navigate to')"
 					@keyup.enter="navigateToPage">
-				<NcButton v-tooltip="t('mediadc', 'Go to page')"
-					type="tertiary"
+				<NcButton :title="t('mediadc', 'Go to page')"
+					variant="tertiary"
 					:aria-label="t('mediadc', 'Navigate to resolved list page')"
 					@click="navigateToPage">
 					<template #icon>
@@ -165,7 +165,7 @@
 							<ClipboardListOutline />
 						</template>
 						<template #action>
-							<NcButton :to="{ name: 'collector' }" type="primary">
+							<NcButton :to="{ name: 'collector' }" variant="primary">
 								{{ t('mediadc', 'Create a new one!') }}
 							</NcButton>
 						</template>
@@ -190,7 +190,7 @@
 						<ClipboardListOutline />
 					</template>
 					<template #action>
-						<NcButton :to="{ name: 'collector' }" type="primary">
+						<NcButton :to="{ name: 'collector' }" variant="primary">
 							{{ t('mediadc', 'Create a new one!') }}
 						</NcButton>
 					</template>
@@ -207,12 +207,10 @@ import { generateUrl } from '@nextcloud/router'
 import Formats from '../../mixins/Formats.js'
 import ResolvedListFile from './ResolvedListFile.vue'
 
-import {
-	NcActionButton,
-	NcButton,
-	NcEmptyContent,
-	NcListItem,
-} from '@nextcloud/vue'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcButton from '@nextcloud/vue/components/NcButton'
+import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
+import NcListItem from '@nextcloud/vue/components/NcListItem'
 import ClipboardListOutline from 'vue-material-design-icons/ClipboardListOutline.vue'
 
 import { mapActions, mapGetters } from 'vuex'

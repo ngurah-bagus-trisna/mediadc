@@ -25,4 +25,4 @@
  */
 ?>
 
-<div id="content"></div>
+<div id="mediadc-app"></div>

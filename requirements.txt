@@ -1,8 +1,10 @@
 numpy
 scipy
 pywavelets
-pillow==10.3.0
+pillow==10.3.0; python_version < "3.13"
+pillow>=11.0.0; python_version >= "3.13"
 hexhamming
 pymysql
+cryptography
 pg8000
 pi-heif>=0.9.0

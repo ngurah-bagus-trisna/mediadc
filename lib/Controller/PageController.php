@@ -57,8 +57,14 @@ class PageController extends Controller {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function index(): TemplateResponse {
-		$this->eventDispatcher->dispatchTyped(new LoadSidebar());
-		$this->eventDispatcher->dispatchTyped(new LoadViewer());
+		// Both classes belong to other apps (Files / Viewer) and may be absent or renamed on a given
+		// Nextcloud version or when the Viewer app is disabled; instantiating a missing class is fatal.
+		if (class_exists(LoadSidebar::class)) {
+			$this->eventDispatcher->dispatchTyped(new LoadSidebar());
+		}
+		if (class_exists(LoadViewer::class)) {
+			$this->eventDispatcher->dispatchTyped(new LoadViewer());
+		}
 
 		Util::addScript(Application::APP_ID, Application::APP_ID . '-main');
 		Util::addStyle(Application::APP_ID, 'style');

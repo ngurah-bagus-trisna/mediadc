@@ -36,11 +36,11 @@
 			</h3>
 			<div class="pagination-wrapper">
 				<div class="pagination-sorting">
-					<NcCheckboxRadioSwitch :checked.sync="sortGroups" style="margin-right: 20px;">
+					<NcCheckboxRadioSwitch v-model="sortGroups" style="margin-right: 20px;">
 						{{ t('mediadc', 'Sort groups') }}
 					</NcCheckboxRadioSwitch>
-					<NcButton v-tooltip="t('mediadc', 'Sorting details by files count')"
-						type="tertiary"
+					<NcButton :title="t('mediadc', 'Sorting details by files count')"
+						variant="tertiary"
 						:aria-label="t('mediadc', 'Sorting details by files count')"
 						@click="toggleSorting">
 						<template #icon>
@@ -51,7 +51,7 @@
 				<Pagination :details="(!filtered) ? details : detailsFiltered"
 					:prev-groups-page="prevGroupsPage"
 					:next-groups-page="nextGroupsPage"
-					:page.sync="page" />
+					v-model:page="page" />
 			</div>
 		</div>
 		<div v-if="details.length > 0">
@@ -60,7 +60,7 @@
 					{{ t('mediadc', 'Filter by duplicate group id: ') }}
 					<input id="group-id-filter"
 						v-model="filterId"
-						v-tooltip="t('mediadc', 'Filter by id or range of ids (1-10)')"
+						:title="t('mediadc', 'Filter by id or range of ids (1-10)')"
 						type="search"
 						name="group-id-filter"
 						placeholder="#id"
@@ -68,8 +68,8 @@
 						@input="filterByGroupId">
 				</label>
 				<div class="batch-actions" style="display: flex;">
-					<NcButton v-tooltip="t('mediadc', 'Toggle duplicate groups')"
-						type="tertiary"
+					<NcButton :title="t('mediadc', 'Toggle duplicate groups')"
+						variant="tertiary"
 						:aria-label="t('mediadc', 'Toggle duplicate groups')"
 						style="margin-right: 10px;"
 						@click="toggleGroups">
@@ -117,12 +117,12 @@
 								</template>
 								{{ t('mediadc', 'Uncheck selected') }}
 							</NcActionButton>
-							<NcActionButton v-tooltip="{content: t('mediadc', 'Mark all files in group as resolved'), placement: 'left'}"
+							<NcActionButton :title="t('mediadc', 'Mark all files in group as resolved')"
 								icon="icon-close"
 								@click="removeCheckedGroups">
 								{{ n('mediadc', 'Remove group', 'Remove groups', checkedDetailGroups.length) }}
 							</NcActionButton>
-							<NcActionButton v-tooltip="{content: t('mediadc', 'Delete all files except the largest one'), placement: 'left'}"
+							<NcActionButton :title="t('mediadc', 'Delete all files except the largest one')"
 								icon="icon-delete"
 								:disabled="batchDeleting"
 								@click="deleteCheckedGroupsFiles">
@@ -144,7 +144,7 @@
 						v-show="detail.files.length > 1"
 						:key="detail.group_id"
 						class="task-details-row">
-						<DetailsListItem :detail="detail" :checked-detail-groups.sync="checkedDetailGroups" />
+						<DetailsListItem :detail="detail" v-model:checked-detail-groups="checkedDetailGroups" />
 					</div>
 				</template>
 				<template v-else>
@@ -152,7 +152,7 @@
 						v-show="detail.files.length > 1"
 						:key="detail.group_id"
 						class="task-details-row">
-						<DetailsListItem :detail="detail" :checked-detail-groups.sync="checkedDetailGroups" />
+						<DetailsListItem :detail="detail" v-model:checked-detail-groups="checkedDetailGroups" />
 					</div>
 				</template>
 			</div>
@@ -162,7 +162,7 @@
 						v-show="detail.files.length > 1"
 						:key="detail.group_id"
 						class="task-details-row">
-						<DetailsListItem :detail="detail" :checked-detail-groups.sync="checkedDetailGroups" />
+						<DetailsListItem :detail="detail" v-model:checked-detail-groups="checkedDetailGroups" />
 					</div>
 				</template>
 				<template v-else>
@@ -170,7 +170,7 @@
 						v-show="detail.files.length > 1"
 						:key="detail.group_id"
 						class="task-details-row">
-						<DetailsListItem :detail="detail" :checked-detail-groups.sync="checkedDetailGroups" />
+						<DetailsListItem :detail="detail" v-model:checked-detail-groups="checkedDetailGroups" />
 					</div>
 				</template>
 			</div>
@@ -191,13 +191,11 @@ import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import { subscribe, unsubscribe, emit } from '@nextcloud/event-bus'
-import {
-	NcCheckboxRadioSwitch,
-	NcButton,
-	NcActions,
-	NcActionButton,
-	NcLoadingIcon,
-} from '@nextcloud/vue'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import NcButton from '@nextcloud/vue/components/NcButton'
+import NcActions from '@nextcloud/vue/components/NcActions'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import MinusBoxOutline from 'vue-material-design-icons/MinusBoxOutline.vue'
 import CheckAll from 'vue-material-design-icons/CheckAll.vue'
 import CheckUnderline from 'vue-material-design-icons/CheckUnderline.vue'
@@ -211,6 +209,7 @@ import Pagination from './Pagination.vue'
 
 export default {
 	name: 'DetailsList',
+	emits: ['update:loading'],
 	components: {
 		DetailsListItem,
 		NcCheckboxRadioSwitch,
@@ -304,7 +303,7 @@ export default {
 		this.$store.commit('setSortGroups', sortGroups !== null ? JSON.parse(sortGroups) === true : true)
 		subscribe('openNextDetailGroup', this.openNextDetailGroup)
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		unsubscribe('openNextDetailGroup', this.openNextDetailGroup)
 	},
 	methods: {

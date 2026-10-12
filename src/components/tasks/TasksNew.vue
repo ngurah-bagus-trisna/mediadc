@@ -35,8 +35,8 @@
 								style="overflow-y: scroll; white-space: nowrap;">
 								{{ targetDirectoriesPaths[fileid] }}
 							</span>
-							<NcButton v-tooltip="{ content: t('mediadc', 'Remove'), placement: 'left'}"
-								type="tertiary"
+							<NcButton :title="t('mediadc', 'Remove')"
+								variant="tertiary"
 								:aria-label="t('mediadc', 'Remove selected target directory')"
 								@click="removeTargetDirectory(fileid)">
 								<template #icon>
@@ -67,8 +67,8 @@
 								style="overflow-y: scroll; white-space: nowrap;">
 								{{ excludeFileIds[fileid] }}
 							</span>
-							<NcButton v-tooltip="{ content: t('mediadc', 'Remove'), placement: 'left'}"
-								type="tertiary"
+							<NcButton :title="t('mediadc', 'Remove')"
+								variant="tertiary"
 								:aria-label="t('mediadc', 'Remove selected exclude directory')"
 								@click="removeExcludeDirectory(fileid)">
 								<template #icon>
@@ -97,8 +97,8 @@
 				<div v-if="customExcludeList.length > 0" class="custom-masks-list">
 					<div v-for="(mask, index) in customExcludeList" :key="index" class="custom-mask">
 						<span>{{ mask }}</span>
-						<NcButton v-tooltip="{ content: t('mediadc', 'Remove'), placement: 'left'}"
-							type="tertiary"
+						<NcButton :title="t('mediadc', 'Remove')"
+							variant="tertiary"
 							:aria-label="t('mediadc', 'Remove selected custom exclude mask')"
 							@click="deleteCustomMask(mask)">
 							<template #icon>
@@ -117,16 +117,16 @@
 						type="text"
 						@keyup.enter="addCustomMask"
 						@keyup.esc="cancelAddingCustomMask">
-					<NcButton v-tooltip="t('mediadc', 'Confirm')"
-						type="tertiary"
+					<NcButton :title="t('mediadc', 'Confirm')"
+						variant="tertiary"
 						:aria-label="t('mediadc', 'Confirm adding of the custom exclude mask')"
 						@click="addCustomMask">
 						<template #icon>
 							<span class="icon-checkmark" />
 						</template>
 					</NcButton>
-					<NcButton v-tooltip="t('mediadc', 'Decline')"
-						type="tertiary"
+					<NcButton :title="t('mediadc', 'Decline')"
+						variant="tertiary"
 						:aria-label="t('mediadc', 'Cancel adding of the custom exclude mask')"
 						@click="cancelAddingCustomMask">
 						<template #icon>
@@ -187,8 +187,8 @@
 			<input v-model="taskName"
 				type="text"
 				:placeholder="t('mediadc', 'Task name')">
-			<NcCheckboxRadioSwitch v-tooltip="t('mediadc', 'Send notification on task finish')"
-				:checked.sync="finishNotification">
+			<NcCheckboxRadioSwitch :title="t('mediadc', 'Send notification on task finish')"
+				v-model="finishNotification">
 				{{ t('mediadc', 'Finish notification') }}
 			</NcCheckboxRadioSwitch>
 		</div>
@@ -201,7 +201,8 @@ import { mapActions, mapGetters } from 'vuex'
 
 import { requestFileInfo, getFileId } from '../../utils/files.js'
 
-import { NcButton, NcCheckboxRadioSwitch } from '@nextcloud/vue'
+import NcButton from '@nextcloud/vue/components/NcButton'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import PlusThick from 'vue-material-design-icons/PlusThick.vue'
 
 export default {

@@ -66,7 +66,7 @@
 			</NcSettingsSection>
 			<NcSettingsSection :name="t('mediadc',mappedSettings.ignore_orientation.display_name)"
 				:description="t('mediadc', mappedSettings.ignore_orientation.description)">
-				<NcCheckboxRadioSwitch :checked.sync="ignore_orientation" @update:checked="updateIgnoreOrientation">
+				<NcCheckboxRadioSwitch v-model="ignore_orientation" @update:model-value="updateIgnoreOrientation">
 					{{ t('mediadc', 'Ignore image orientation') }}
 				</NcCheckboxRadioSwitch>
 			</NcSettingsSection>
@@ -82,7 +82,7 @@
 								<span class="icon-filter" />
 							</template>
 							<template #actions>
-								<NcActionButton v-tooltip="{ content: t('mediadc', 'Remove'), placement: 'left'}"
+								<NcActionButton :title="t('mediadc', 'Remove')"
 									icon="icon-delete"
 									:close-after-click="true"
 									@click="deleteCustomMask(mask)">
@@ -102,15 +102,15 @@
 								type="text"
 								@keyup.enter="addCustomMask"
 								@keyup.esc="cancelAddingCustomMask">
-							<NcButton v-tooltip="t('mediadc', 'Confirm')"
-								type="tertiary"
+							<NcButton :title="t('mediadc', 'Confirm')"
+								variant="tertiary"
 								@click="addCustomMask">
 								<template #icon>
 									<span class="icon-checkmark" />
 								</template>
 							</NcButton>
-							<NcButton v-tooltip="t('mediadc', 'Decline')"
-								type="tertiary"
+							<NcButton :title="t('mediadc', 'Decline')"
+								variant="tertiary"
 								@click="cancelAddingCustomMask">
 								<template #icon>
 									<span class="icon-close" />
@@ -118,7 +118,7 @@
 							</NcButton>
 						</div>
 						<NcButton v-if="!addingCustomMask"
-							type="secondary"
+							variant="secondary"
 							@click="addNewMask">
 							{{ t('mediadc', 'Add mask') }}
 							<template #icon>
@@ -140,7 +140,7 @@
 			</NcSettingsSection>
 			<NcSettingsSection :name="t('mediadc', mappedSettings.python_binary.display_name)"
 				:description="t('mediadc', mappedSettings.python_binary.description)">
-				<NcCheckboxRadioSwitch :checked.sync="python_binary" @update:checked="updatePythonBinary">
+				<NcCheckboxRadioSwitch v-model="python_binary" @update:model-value="updatePythonBinary">
 					{{ t('mediadc', 'Use pre-compiled Python binaries') }}
 				</NcCheckboxRadioSwitch>
 			</NcSettingsSection>
@@ -168,15 +168,13 @@ import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import { loadState } from '@nextcloud/initial-state'
 
-import {
-	NcActionButton,
-	NcButton,
-	NcEmptyContent,
-	NcListItem,
-	NcSettingsSection,
-	NcCheckboxRadioSwitch,
-	NcLoadingIcon,
-} from '@nextcloud/vue'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcButton from '@nextcloud/vue/components/NcButton'
+import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
+import NcListItem from '@nextcloud/vue/components/NcListItem'
+import NcSettingsSection from '@nextcloud/vue/components/NcSettingsSection'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 
 import PlusThick from 'vue-material-design-icons/PlusThick.vue'
 import AlertCircleOutline from 'vue-material-design-icons/AlertCircleOutline.vue'

@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace OCA\MediaDC\Service;
 
 use Psr\Log\LoggerInterface;
+use OCP\IConfig;
 
 class PythonService {
 	public function __construct(
 		private readonly LoggerInterface $logger,
 		private readonly CPAUtilsService $cpaUtils,
 		private readonly PythonSetupService $pythonSetup,
+		private readonly IConfig $config,
 	) {
 	}
 
@@ -77,7 +79,8 @@ class PythonService {
 		$prefixedNohupCmd = 'env ' . $envStr . 'nohup ' . $cmd;
 
 		if ($nonBlocking) {
-			$logDir = \OC::$SERVERROOT . '/data/appdata_' . \OC::$server->getConfig()->getSystemValue('instanceid')
+			$instanceId = (string) $this->config->getSystemValue('instanceid', '');
+			$logDir = \OC::$SERVERROOT . '/data/appdata_' . $instanceId
 				. '/' . $appId . '/logs';
 			@mkdir($logDir, 0755, true);
 			$logFile = $logDir . '/task_' . date('Y-m-d_H-i-s') . '.log';

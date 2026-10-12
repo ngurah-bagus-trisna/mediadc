@@ -113,7 +113,7 @@ Entry points: `src/main.js` (main app), `src/main-admin-settings.js` (admin sett
 
 ## Version compatibility
 
-Current `appinfo/info.xml` declares **Nextcloud min-version="30" max-version="31"**. The primary task for this project is bumping max-version to support the latest Nextcloud releases and fixing any API breaks.
+Current `appinfo/info.xml` declares **Nextcloud min-version="33" max-version="35"** (33 is the floor because the Files action uses `@nextcloud/files` v4). When bumping max-version, check the Nextcloud developer manual's "Critical changes" page for the new release and fix any API breaks, not just `info.xml`.
 
 Python dependencies are tightly pinned — `nc-py-api==0.0.11` and `pillow==10.3.0`. Upgrading `nc-py-api` may be needed for compatibility with newer Nextcloud/`cloud_py_api` versions.
 

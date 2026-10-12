@@ -1,6 +1,6 @@
 # Nextcloud MediaDC
 
-> Community-maintained fork — updated to support Nextcloud 30–34.
+> Community-maintained fork — updated to support Nextcloud 33–35.
 
 **📸📹 Collect photo and video duplicates to save your cloud storage space**
 
@@ -18,7 +18,7 @@ The [original MediaDC](https://github.com/cloud-py-api/mediadc) by Andrey Boryse
 
 ## 🚀 Installation
 
-### Fresh install (Nextcloud 30–34)
+### Fresh install (Nextcloud 33–35)
 
 1. Download `mediadc.tar.gz` from the [latest release](https://github.com/ngurah-bagus-trisna/mediadc/releases/latest)
 2. Extract to your Nextcloud `apps/` directory:
@@ -41,8 +41,8 @@ sudo -u www-data bash /path/to/nextcloud/apps/mediadc/scripts/setup-check.sh /pa
 This checks: system deps, PHP, Nextcloud status, Python venv, all packages, DB connectivity, and runs an end-to-end smoke test.
 
 **Requirements:**
-- Nextcloud 30, 31, 32, 33, or 34
-- PHP 8.1 or later
+- Nextcloud 33, 34, or 35 (for Nextcloud 30–32 use release 0.5.2 — the Files-menu action now uses `@nextcloud/files` v4, which only exists on Nextcloud 33+)
+- PHP 8.1 or later (Nextcloud 35 itself requires PHP 8.3+)
 - Python 3.9 or later (with `venv` support — `apt install python3-venv` on Debian/Ubuntu if missing)
 - `ffmpeg` (optional — only needed for video duplicate detection)
 
@@ -61,7 +61,7 @@ sudo -u www-data php occ app:enable mediadc
 | Requires `cloud_py_api` app installed | Self-contained — cloud_py_api vendored |
 | Manual Python venv + pip install | Auto-setup during app enable |
 | PostgreSQL & MySQL only | SQLite also supported |
-| Nextcloud 30–31 only | Nextcloud 30–34 |
+| Nextcloud 30–31 only | Nextcloud 33–35 |
 | Tasks stuck pending from UI | Fixed — async worker launches correctly |
 | Binary download mode | Source Python mode (simpler, no GitHub download) |
 

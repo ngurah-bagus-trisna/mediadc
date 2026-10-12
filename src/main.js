@@ -24,15 +24,13 @@
 
 import { generateFilePath } from '@nextcloud/router'
 import { getRequestToken } from '@nextcloud/auth'
-import { Tooltip } from '@nextcloud/vue'
-import { sync } from 'vuex-router-sync'
-import { translate, translatePlural } from '@nextcloud/l10n'
 import '@nextcloud/dialogs/style.css'
-import Vue from 'vue'
+import { createApp } from 'vue'
 
 import MediaDC from './MediaDC.vue'
 import router from './router/index.js'
 import store from './store/index.js'
+import { installGlobals } from './vue-globals.js'
 
 // eslint-disable-next-line
 __webpack_nonce__ = btoa(getRequestToken())
@@ -40,25 +38,20 @@ __webpack_nonce__ = btoa(getRequestToken())
 // eslint-disable-next-line
 __webpack_public_path__ = generateFilePath('mediadc', '', 'js/')
 
-sync(store, router)
-
-Vue.directive('tooltip', Tooltip)
 window.addEventListener('DOMContentLoaded', () => {
-	if (!window.OCA.Files) {
-		window.OCA.Files = {}
+	window.OCA = window.OCA || {}
+	window.OCA.Files = window.OCA.Files || {}
+
+	if (window.OC?.Files?.getClient) {
+		window.OCA.Files.App = window.OCA.Files.App || {}
+		window.OCA.Files.App.fileList = window.OCA.Files.App.fileList || {}
+		window.OCA.Files.App.fileList.filesClient = window.OC.Files.getClient()
 	}
-	// For sidebar functionality
-	Object.assign(window.OCA.Files, { App: { fileList: { filesClient: OC.Files.getClient() } } }, window.OCA.Files)
 })
 
-Vue.prototype.t = translate
-Vue.prototype.n = translatePlural
-Vue.prototype.OC = window.OC
-Vue.prototype.OCA = window.OCA
+const app = createApp(MediaDC)
+installGlobals(app)
+app.use(router)
+app.use(store)
 
-export default new Vue({
-	el: '#content',
-	router,
-	store,
-	render: h => h(MediaDC),
-})
+export default app.mount('#mediadc-app')

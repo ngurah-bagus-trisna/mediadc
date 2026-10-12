@@ -26,6 +26,7 @@ import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 
 import Formats from '../mixins/Formats.js'
+import router from '../router/index.js'
 
 const state = {
 	task: {},
@@ -332,7 +333,7 @@ const actions = {
 	 * @return {Promise<object>} request data (collectorTask, collectorTaskDetails)
 	 */
 	async getTaskDetails(context) {
-		return axios.get(generateUrl(`/apps/mediadc/api/v1/tasks/${context.rootState.route.params.taskId}`)).then(res => {
+		return axios.get(generateUrl(`/apps/mediadc/api/v1/tasks/${router.currentRoute.value.params.taskId}`)).then(res => {
 			if ('success' in res.data && res.data.success) {
 				context.commit('setTask', res.data.collectorTask)
 				context.commit('setDetails', res.data.collectorTaskDetails)
@@ -353,7 +354,7 @@ const actions = {
 	 * @return {Promise<object>} request data (collectorTaskInfo: target/exclude directories info)
 	 */
 	async getTaskInfo(context) {
-		return axios.get(generateUrl(`/apps/mediadc/api/v1/tasks/${context.rootState.route.params.taskId}/info`)).then(res => {
+		return axios.get(generateUrl(`/apps/mediadc/api/v1/tasks/${router.currentRoute.value.params.taskId}/info`)).then(res => {
 			context.commit('setTaskInfo', res.data.collectorTaskInfo)
 			return res
 		})
@@ -366,7 +367,7 @@ const actions = {
 	 * @return {Promise<object>} request data (task details filessize and filestotal)
 	 */
 	async getDetailFilesTotalSize(context) {
-		const taskId = context.rootState.route.params.taskId
+		const taskId = router.currentRoute.value.params.taskId
 		return axios.get(generateUrl(`/apps/mediadc/api/v1/tasks/${taskId}/filestotal`)).then(res => {
 			context.commit('setDetailsInfo', { filessize: res.data.filessize, filestotal: res.data.filestotal })
 			return res

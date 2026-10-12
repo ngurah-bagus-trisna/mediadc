@@ -27,10 +27,10 @@
 		class="details-list-item"
 		:class="{'icon-loading': updating}">
 		<div class="details-list-item-title">
-			<NcCheckboxRadioSwitch v-tooltip="{content: t('mediadc', 'Select group'), placement: 'top'}"
+			<NcCheckboxRadioSwitch :title="t('mediadc', 'Select group')"
 				class="mediadc-checkbox-only batch-checkbox"
-				:checked.sync="checked" />
-			<NcButton type="tertiary"
+				v-model="checked" />
+			<NcButton variant="tertiary"
 				class="open-details-btn"
 				:aria-label="t('mediadc', 'Open duplicate group')"
 				@click="openDetailFiles(detail)">
@@ -51,7 +51,7 @@
 			</NcActions>
 		</div>
 		<div v-if="opened && groupFilesTotal > groupItemsPerPage" class="pagination">
-			<NcButton type="tertiary"
+			<NcButton variant="tertiary"
 				:aria-label="t('mediadc', 'Previous duplicate group files page')"
 				style="margin-right: 5px;"
 				@click="openPrevDetailFiles(detail)">
@@ -61,7 +61,7 @@
 			</NcButton>
 			<span>{{ t('mediadc', 'Page:') }}&nbsp;</span>
 			<span>{{ page + 1 }}/{{ Math.ceil(groupFilesTotal / groupItemsPerPage) }}</span>
-			<NcButton type="tertiary"
+			<NcButton variant="tertiary"
 				:aria-label="t('mediadc', 'Next duplicate group files page')"
 				style="margin-left: 5px;"
 				@click="openNextDetailFiles(detail)">
@@ -79,8 +79,8 @@
 				:aria-label="t('mediadc', 'Page to navigate to')"
 				@keyup.enter="navigateToPage">
 			<NcButton v-if="detail.files.length > groupItemsPerPage"
-				v-tooltip="t('mediadc', 'Go to page')"
-				type="tertiary"
+				:title="t('mediadc', 'Go to page')"
+				variant="tertiary"
 				:aria-label="t('mediadc', 'Navigate to duplicate list page')"
 				@click="navigateToPage">
 				<template #icon>
@@ -92,9 +92,9 @@
 			:detail="detail"
 			:files="files"
 			:all-files="allFiles"
-			:loading-files.sync="loadingFiles"
-			:updating.sync="updating"
-			:files-ascending.sync="filesAscending" />
+			v-model:loading-files="loadingFiles"
+			v-model:updating="updating"
+			v-model:files-ascending="filesAscending" />
 	</div>
 </template>
 
@@ -103,12 +103,11 @@ import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import { subscribe, unsubscribe, emit } from '@nextcloud/event-bus'
-import {
-	NcCheckboxRadioSwitch,
-	NcActions,
-	NcActionButton,
-	NcButton,
-} from '@nextcloud/vue'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import { confirmDialog } from '../../utils/confirm.js'
+import NcActions from '@nextcloud/vue/components/NcActions'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcButton from '@nextcloud/vue/components/NcButton'
 
 import { mapGetters } from 'vuex'
 
@@ -117,6 +116,7 @@ import DetailsGroupList from './DetailsGroupList.vue'
 
 export default {
 	name: 'DetailsListItem',
+	emits: ['update:checkedDetailGroups'],
 	components: {
 		NcActions,
 		NcActionButton,
@@ -217,7 +217,7 @@ export default {
 		subscribe('openGroup', this.openGroup)
 		subscribe('toggleGroup', this.toggleGroup)
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		unsubscribe('updateGroupFilesPagination', this.updateFilesPagination)
 		unsubscribe('deselectGroups', this.deselect)
 		unsubscribe('openGroup', this.openGroup)
@@ -282,13 +282,14 @@ export default {
 		},
 		removeTaskDetail(detail) {
 			if (this.deleteFileConfirmation) {
-				const self = this
-				OC.dialogs.confirm(this.t('mediadc', 'Are you sure you want to remove this group without deleting files?'),
-					this.t('mediadc', 'Confirm group removal'), function(success) {
-						if (success) {
-							self._removeTaskDetail(detail)
-						}
-					})
+				confirmDialog(
+					this.t('mediadc', 'Confirm group removal'),
+					this.t('mediadc', 'Are you sure you want to remove this group without deleting files?'),
+				).then((success) => {
+					if (success) {
+						this._removeTaskDetail(detail)
+					}
+				})
 			} else {
 				this._removeTaskDetail(detail)
 			}

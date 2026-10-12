@@ -48,7 +48,7 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 
-import { NcEmptyContent } from '@nextcloud/vue'
+import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import ClipboardListOutline from 'vue-material-design-icons/ClipboardListOutline.vue'
 
 import Formats from '../../mixins/Formats.js'
@@ -75,7 +75,7 @@ export default {
 	beforeMount() {
 		this.tasksUpdater = setInterval(() => this.getTasks(true), 5000)
 	},
-	beforeDestroy() {
+	beforeUnmount() {
 		clearInterval(this.tasksUpdater)
 	},
 	methods: {

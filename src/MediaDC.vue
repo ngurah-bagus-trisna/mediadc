@@ -27,8 +27,7 @@
 		<NcAppNavigation>
 			<template #list>
 				<NcAppNavigationItem :to="{name: 'collector'}"
-					:name="t('mediadc', 'Tasks')"
-					exact>
+					:name="t('mediadc', 'Tasks')">
 					<template #icon>
 						<FormatListBulletedSquare :size="20" />
 					</template>
@@ -45,21 +44,26 @@
 					<NcAppNavigationItem :aria-label="t('mediadc', 'Open MediaDC settings')"
 						:name="t('mediadc', 'Settings')"
 						@click.prevent.stop="openSettingsModal">
-						<Cog slot="icon" :size="20" />
+						<template #icon>
+							<Cog :size="20" />
+						</template>
 					</NcAppNavigationItem>
 				</ul>
 			</template>
-			<AppSettings :open.sync="settingsOpened"
+			<AppSettings v-model:open="settingsOpened"
 				@close="closeSettingsModal" />
 		</NcAppNavigation>
 		<NcAppContent :class="{ 'icon-loading': loading }">
-			<router-view v-show="!loading" :loading.sync="loading" />
+			<router-view v-model:loading="loading" />
 		</NcAppContent>
 	</NcContent>
 </template>
 
 <script>
-import { NcContent, NcAppContent, NcAppNavigation, NcAppNavigationItem } from '@nextcloud/vue'
+import NcContent from '@nextcloud/vue/components/NcContent'
+import NcAppContent from '@nextcloud/vue/components/NcAppContent'
+import NcAppNavigation from '@nextcloud/vue/components/NcAppNavigation'
+import NcAppNavigationItem from '@nextcloud/vue/components/NcAppNavigationItem'
 import Cog from 'vue-material-design-icons/Cog.vue'
 import FormatListBulletedSquare from 'vue-material-design-icons/FormatListBulletedSquare.vue'
 import FormatListChecks from 'vue-material-design-icons/FormatListChecks.vue'

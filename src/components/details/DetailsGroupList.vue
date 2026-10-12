@@ -27,7 +27,7 @@
 		<div class="filters">
 			<div class="sorting">
 				{{ t('mediadc', 'Files size sorting') }}
-				<NcButton type="tertiary"
+				<NcButton variant="tertiary"
 					:aria-label="t('mediadc', 'Toggle files size sorting')"
 					style="margin: 0 10px;"
 					@click="updateFileSorting">
@@ -50,7 +50,7 @@
 			<div v-if="checkedFiles.length > 0" class="batch-editing">
 				{{ n('mediadc', 'Batch actions for %n file', 'Batch actions for %n files', checkedFiles.length) }}
 				<NcActions placement="left" style="margin-left: 5px;">
-					<NcActionButton v-tooltip="{content: t('mediadc', 'Select all files in a group'), placement: 'left'}"
+					<NcActionButton :title="t('mediadc', 'Select all files in a group')"
 						icon="icon-checkmark"
 						@click="selectAllFiles">
 						{{ checkedFiles.length === allFiles.length ? t('mediadc', 'Deselect all') : t('mediadc', 'Select all') }}
@@ -60,12 +60,12 @@
 						@click="selectAllFilesOnPage">
 						{{ checkedFilesIntersect.length === files.length ? t('mediadc', 'Deselect all on page') : t('mediadc', 'Select all on page') }}
 					</NcActionButton>
-					<NcActionButton v-tooltip="{content: t('mediadc', 'Mark as resolved without deleting'), placement: 'left'}"
+					<NcActionButton :title="t('mediadc', 'Mark as resolved without deleting')"
 						icon="icon-close"
 						@click="removeCheckedFiles">
 						{{ n('mediadc', 'Remove file', 'Remove files', checkedFiles.length) }}
 					</NcActionButton>
-					<NcActionButton v-tooltip="{content: n('mediadc', 'Delete selected file', 'Delete selected files', checkedFiles.length), placement: 'left'}"
+					<NcActionButton :title="n('mediadc', 'Delete selected file', 'Delete selected files', checkedFiles.length)"
 						icon="icon-delete"
 						@click="deleteCheckedFiles">
 						{{ n('mediadc', 'Delete file', 'Delete files', checkedFiles.length) }}
@@ -79,7 +79,7 @@
 				:file="file"
 				:files="files"
 				:all-files="allFiles"
-				:checked-files.sync="checkedFiles"
+				v-model:checked-files="checkedFiles"
 				:detail="detail" />
 		</div>
 		<div v-else-if="filteredFiles.length > 0" class="details-group-files">
@@ -88,7 +88,7 @@
 				:file="file"
 				:files="files"
 				:all-files="allFiles"
-				:checked-files.sync="checkedFiles"
+				v-model:checked-files="checkedFiles"
 				:detail="detail" />
 		</div>
 		<div v-else class="details-group-files">
@@ -109,13 +109,16 @@ import { showError, showMessage, showSuccess, showWarning } from '@nextcloud/dia
 import { generateUrl } from '@nextcloud/router'
 import { emit } from '@nextcloud/event-bus'
 
-import { NcActions, NcActionButton, NcButton } from '@nextcloud/vue'
+import NcActions from '@nextcloud/vue/components/NcActions'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcButton from '@nextcloud/vue/components/NcButton'
 
 import Formats from '../../mixins/Formats.js'
 import DetailsFile from './DetailsFile.vue'
 
 export default {
 	name: 'DetailsGroupList',
+	emits: ['update:allFiles', 'update:filesAscending', 'update:updating'],
 	components: {
 		DetailsFile,
 		NcActions,

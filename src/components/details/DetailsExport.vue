@@ -48,10 +48,11 @@
 <script>
 import { generateUrl } from '@nextcloud/router'
 
-import { NcButton } from '@nextcloud/vue'
+import NcButton from '@nextcloud/vue/components/NcButton'
 
 export default {
 	name: 'DetailsExport',
+	emits: ['update:opened'],
 	components: {
 		NcButton,
 	},

@@ -24,26 +24,37 @@
 
 import { generateFilePath } from '@nextcloud/router'
 import { getRequestToken } from '@nextcloud/auth'
-import { translate, translatePlural } from '@nextcloud/l10n'
+import { createApp } from 'vue'
 
-import Vue from 'vue'
 import Dashboard from './views/Dashboard.vue'
+import { installGlobals } from './vue-globals.js'
 
 // eslint-disable-next-line
 __webpack_nonce__ = btoa(getRequestToken())
+
 // eslint-disable-next-line
 __webpack_public_path__ = generateFilePath('mediadc', '', 'js/')
 
-Vue.prototype.t = translate
-Vue.prototype.n = translatePlural
-Vue.prototype.OC = window.OC
-Vue.prototype.OCA = window.OCA
+function registerDashboard() {
+	const register = window.OCA?.Dashboard?.register
 
-document.addEventListener('DOMContentLoaded', () => {
-	const register = OCA?.Dashboard?.register || (() => {})
+	if (typeof register !== 'function') {
+		return
+	}
 
 	register('mediadc-tasks', (el) => {
-		const View = Vue.extend(Dashboard)
-		new View().$mount(el)
+		const app = createApp(Dashboard)
+		installGlobals(app)
+		app.mount(el)
 	})
-})
+}
+
+if (document.readyState === 'loading') {
+	document.addEventListener(
+		'DOMContentLoaded',
+		registerDashboard,
+		{ once: true },
+	)
+} else {
+	registerDashboard()
+}
